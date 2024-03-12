@@ -1,5 +1,5 @@
 from flask import Flask;
-from flask import render_templates
+from flask import render_template; 
 app = Flask(__name__)
 
 
@@ -9,4 +9,4 @@ def hello_world():
 
 @app.route("/login")
 def login():
-    return 'login'; 
+    return render_template('login.html')
