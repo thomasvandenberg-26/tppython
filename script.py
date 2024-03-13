@@ -10,3 +10,7 @@ def hello_world():
 @app.route("/login")
 def login():
     return render_template('login.html')
+
+@app.route("/tableauIdees")
+def tableauIdees():
+    return render_template('tableauIdees.html')
