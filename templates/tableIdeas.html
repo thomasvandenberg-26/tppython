@@ -1,13 +1,14 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Tableau d'Idees</title>
-  <meta name="viewport" content="initial-scale=1.0; maximum-scale=1.0; width=device-width;">
+  <title>Table of Ideas</title>
 </head>
 
 <body>
 <div class="table-title">
 <h3> Your ideas</h3>
+
+
 </div>
 <table class="table-fill">
 <thead>
@@ -20,45 +21,51 @@
 </tr>
 </thead>
 <tbody class="table-hover">
+  {% for idea in ideas %}
 <tr>
-<td class="text-left"></td>
-<td class="text-left"></td>
-<td class="text-left"> </td>
-<td class="text-left"></td>
-<td class="text-left"> </td>
+<td class="text-left">{{idea[0]}}</td>
+<td class="text-left">{{idea[1]}}</td>
+<td class="text-left">{{idea[2]}} </td>
+<td class="text-left">{{idea[3]}}</td>
+<td class="text-left">{{"Oui" if idea[4]== 1 else "Non"}}</td>
+
 </tr>
-<tr>
-<td class="text-left"></td>
-<td class="text-left"></td>
-<td class="text-left"> </td>
-<td class="text-left"> </td>
-<td class="text-left"> </td>
-</tr>
-<tr>
-<td class="text-left"></td>
-<td class="text-left"></td>
-<td class="text-left"> </td>
-<td class="text-left"> </td>
-<td class="text-left"> </td>
-</tr>
-<tr>
-<td class="text-left"></td>
-<td class="text-left"></td>
-<td class="text-left"> </td>
-<td class="text-left"> </td>
-<td class="text-left"> </td>
-</tr>
-<tr>
-<td class="text-left"></td>
-<td class="text-left"></td>
-<td class="text-left"> </td>
-<td class="text-left"> </td>
-<td class="text-left"> </td>
-</tr>
+{% endfor %}
 </tbody>
 </table>
   
+  
 
+  <!-- sample html for this button-->
+  <form action="/sortedIdeas" method="GET">
+    <input type="submit" class="green-button" value="SORT">
+</form>
+ 
+ 
+<!-- stylesheet for this button -->
+<style type="text/css">
+ .green-button {
+  margin-left: 880px;
+  margin-top: 12px;
+  width: 4%;
+    background-color: green;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.green-button:hover {
+    background-color: darkgreen;
+}
+button.green-button {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+</style>
   </body>
 
 <style>
