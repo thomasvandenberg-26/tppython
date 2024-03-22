@@ -7,8 +7,10 @@
 </head>
 <body>
     
-    <form action="/submit" method="post">
-     <h1> Form Ideas </h1>
+    <form action="/submit/{{ user_id }}" method="post">
+     <h1> Welcome User {{ user_id }} </h1>
+      <br>
+    <h1> Form Ideas </h1>
     <input name="Name" id="Name" type="text" placeholder="name of your idea">
     <textarea name="Description" id="" cols="30" rows="10"></textarea>
     <input name="Desire" id="Desire" type="text" placeholder="Desire  from 1 to 5">

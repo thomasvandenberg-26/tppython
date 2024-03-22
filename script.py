@@ -22,18 +22,18 @@ def login():
     return render_template('login.html')
 
 ## i send the ideas table 
-@app.route("/tableauIdees")
-def tableauIdees():
+@app.route("/tableIdea/<user_id>")
+def tableIdea(user_id):
     ## i query the database ideas table
-    ideas= returnIdeas()
-    return render_template('tableauIdees.html',ideas=ideas)
+    ideas= returnIdeas(format(user_id))
+    return render_template('tableIdeas.html',ideas=ideas)
 
 ## i call the function to sort the ideas with the number of the desire
-@app.route("/sortedIdeas")
-def sortedIdeas():
+@app.route("/sortedIdeas/<user_id>")
+def sortedIdeas(user_id):
     ## i query the database ideas table to sort the data
-    ideas = sortByDesire()
-    return render_template('tableauIdees.html',ideas=ideas)
+    ideas = sortByDesire(format(user_id))
+    return render_template('tableIdeas.html',ideas=ideas)
 
         
 @app.route('/formIdea/<user_id>')
@@ -66,10 +66,10 @@ if not Path(DATABASE).exists():
         db.commit()
 
 #method to threat the form id
-@app.route('/submit/<user_id>', methods=['GET'])
+@app.route('/submit/<user_id>', methods=['POST'])
 
 def submit(user_id):
-    if request.method == 'GET':
+    if request.method == 'POST':
         name = request.form.get('Name')
         description = request.form.get('Description')
         desire = request.form.get('Desire')
@@ -84,20 +84,23 @@ def submit(user_id):
 # Insérer les données dans la table IDEAS
         db = get_db()
 
-        queryInsert = 'INSERT INTO IDEAS (Name, Description, Desire, Category, Needed WHERE user_id = ?) VALUES (?, ?, ?, ?, ?);'
+        queryInsert = 'INSERT INTO IDEAS (Name, Description, Desire, Category, Needed, user_id) VALUES (?, ?, ?, ?, ?, ?);'
      
       
-        query_db(queryInsert, [user_id,name, description, desire, category, needed] )
+        query_db(queryInsert, [name, description, desire, category, needed,user_id] )
         # Sélectionner et afficher les données insérées
       
         db.commit()
-        return redirect(url_for('tableauIdees'))
+        return redirect(url_for('tableIdea', user_id=user_id))
         
 def query_db(query, args=(), one=False):
     cur = get_db().execute(query, args)
     rv = cur.fetchall()
     cur.close()
-    return (rv[0] if rv else None) if one else rv
+    if one:
+        return (rv[0] if rv else None)
+    else:
+        return rv
 
 ## return ideas of the user id (username)
 def returnIdeas(id):
@@ -106,9 +109,9 @@ def returnIdeas(id):
     return result
 
 # i sort table with the desire, i sort with the most important ideas
-def sortByDesire():
-    querySort = 'SELECT Name, Description, Desire, Category, Needed FROM IDEAS ORDER BY Desire DESC'
-    result = query_db(querySort)
+def sortByDesire(user_id):
+    querySort = 'SELECT Name, Description, Desire, Category, Needed, user_id FROM IDEAS Where user_id = ? ORDER BY Desire DESC  '
+    result = query_db(querySort, [user_id])
     return result
 
 ## connection
@@ -132,7 +135,7 @@ def processLoginForm():
             connection(username, password)
             user_id = getIdUser(username)
         if user_id:
-            return redirect(url_for('formIdea', user_id=user_id ))
+            return render_template('formIdeas.html', user_id=user_id)
         else:
             return "user not find"
 
@@ -144,10 +147,12 @@ def logout():
     return redirect(url_for('login'))
 
 def getIdUser(username):
-    query = 'SELECT id FROM USERS where Username = ? '
-    result = query_db(query, [username] )
-    if result:
-        return result[0]['id']
-    else:
-        return None 
     
+    db = get_db()
+    cursor = db.execute('SELECT id FROM users WHERE username = ?', (username,))
+    user = cursor.fetchone()
+    cursor.close()
+    if user:
+        return user[0]
+    else:
+        return None
