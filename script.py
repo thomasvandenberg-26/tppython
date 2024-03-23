@@ -21,6 +21,9 @@ def hello_world():
 def login():
     return render_template('login.html')
 
+@app.route("/register")
+def register():
+    return render_template("register.html")
 ## i send the ideas table 
 @app.route("/tableIdea/<user_id>")
 def tableIdea(user_id):
@@ -29,10 +32,10 @@ def tableIdea(user_id):
     return render_template('tableIdeas.html',ideas=ideas)
 
 ## i call the function to sort the ideas with the number of the desire
-@app.route("/sortedIdeas/<user_id>")
-def sortedIdeas(user_id):
+@app.route("/sortedIdeas")
+def sortedIdeas():
     ## i query the database ideas table to sort the data
-    ideas = sortByDesire(format(user_id))
+    ideas = sortByDesire()
     return render_template('tableIdeas.html',ideas=ideas)
 
         
@@ -65,6 +68,7 @@ if not Path(DATABASE).exists():
         db.cursor().executescript(sql)
         db.commit()
 
+
 #method to threat the form id
 @app.route('/submit/<user_id>', methods=['POST'])
 
@@ -75,6 +79,13 @@ def submit(user_id):
         desire = request.form.get('Desire')
         category = request.form.get('Category')
         needed = request.form.get('Needed')
+        try:
+            value = int(desire)
+        except ValueError:
+             return "La valeur entrée n'est pas un nombre ou n'est pas dans le bon format."
+        if value < 1 or value > 5:
+         return "La valeur entrée doit être un nombre entre 1 et 5."
+
         if needed.lower() == "yes":
             needed = 1
         elif needed.lower() == "no":
@@ -92,6 +103,7 @@ def submit(user_id):
       
         db.commit()
         return redirect(url_for('tableIdea', user_id=user_id))
+    
         
 def query_db(query, args=(), one=False):
     cur = get_db().execute(query, args)
@@ -101,6 +113,7 @@ def query_db(query, args=(), one=False):
         return (rv[0] if rv else None)
     else:
         return rv
+    
 
 ## return ideas of the user id (username)
 def returnIdeas(id):
@@ -108,11 +121,14 @@ def returnIdeas(id):
     result = query_db(queryCheckIdeas, id)
     return result
 
+
 # i sort table with the desire, i sort with the most important ideas
-def sortByDesire(user_id):
-    querySort = 'SELECT Name, Description, Desire, Category, Needed, user_id FROM IDEAS Where user_id = ? ORDER BY Desire DESC  '
+def sortByDesire():
+    user_id = session['user_id']
+    querySort = 'SELECT Name, Description, Desire, Category, Needed FROM IDEAS Where user_id = ? ORDER BY Desire DESC  '
     result = query_db(querySort, [user_id])
     return result
+
 
 ## connection
 def connection(username, password):
@@ -125,6 +141,7 @@ def connection(username, password):
     else:
         return "cet utilisateur n'existe pas"
 
+
 ## is the function which get the password and username from the login form 
 @app.route('/connection', methods=['GET','POST'])   
 def processLoginForm():
@@ -135,12 +152,15 @@ def processLoginForm():
             connection(username, password)
             user_id = getIdUser(username)
         if user_id:
+            session['user_id'] = user_id
             return render_template('formIdeas.html', user_id=user_id)
         else:
             return "user not find"
 
     else:
         return redirect(url_for('login'))
+    
+    
 ## its the logout  function
 def logout():
     session.pop('logged_in',None)
@@ -156,3 +176,22 @@ def getIdUser(username):
         return user[0]
     else:
         return None
+
+
+@app.route('/registration', methods=['POST'])
+def registration():
+    if request.method == 'POST':
+         username= request.form.get('username')
+         password = request.form.get('password')
+         if username and password: 
+        
+            query = "INSERT INTO USERS(Username,Password) VALUES(?,?);"
+            result = query_db(query,[username,password] )
+         else:
+             return redirect(url_for('register'))
+         if result:
+             return redirect(url_for('login'))
+         else:
+            # Gérer les autres méthodes (par exemple, afficher un message d'erreur)
+            return "Méthode non autorisée. Veuillez utiliser la méthode POST."
+

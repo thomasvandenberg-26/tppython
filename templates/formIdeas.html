@@ -4,21 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Form Ideas</title>
+ 
 </head>
 <body>
-    
-    <form action="/submit/{{ user_id }}" method="post">
+
+ 
+    <form class="space-y-6" action="/submit/{{ user_id }}" method="post">
      <h1> Welcome User {{ user_id }} </h1>
       <br>
     <h1> Form Ideas </h1>
-    <input name="Name" id="Name" type="text" placeholder="name of your idea">
-    <textarea name="Description" id="" cols="30" rows="10"></textarea>
-    <input name="Desire" id="Desire" type="text" placeholder="Desire  from 1 to 5">
-    <input name="Category" id="Category" type="text" placeholder="Category">
-    <input name="Needed" id="Needed" type="text" placeholder="Needed ? Yes or No">
+    <input name="Name" id="Name" type="text" placeholder="name of your idea" >
+    <textarea name="Description" id="" cols="30" rows="10" ></textarea>
+    <input name="Desire" id="Desire" type="text" placeholder="Desire  from 1 to 5" >
+    <input name="Category" id="Category" type="text" placeholder="Category" >
+    <input name="Needed" id="Needed" type="text" placeholder="Needed ? Yes or No" >
     <input style="background-color: #A5FFC9" type="submit" value="Envoyer le formulaire" />
     </form>
-
+  </div>
 
 </body>
 </html>

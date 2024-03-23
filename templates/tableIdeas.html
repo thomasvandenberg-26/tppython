@@ -22,7 +22,7 @@
 </thead>
 <tbody class="table-hover">
   {% for idea in ideas %}
-<tr>
+<tr data-idea-id="{{ idea.id }}">
 <td class="text-left">{{idea[0]}}</td>
 <td class="text-left">{{idea[1]}}</td>
 <td class="text-left">{{idea[2]}} </td>
@@ -37,10 +37,12 @@
   
 
   <!-- sample html for this button-->
-  <form action="/sortedIdeas/{{ user_id }}" method="GET">
+  <form action="/sortedIdeas" method="GET">
     <input type="submit" class="green-button" value="SORT">
 </form>
- 
+ <script>
+  
+ </script>
  
 <!-- stylesheet for this button -->
 <style type="text/css">
