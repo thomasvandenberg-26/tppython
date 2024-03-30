@@ -184,7 +184,7 @@ def getIdUser(username):
     else:
         return None 
 
-
+## register function
 @app.route('/registration', methods=['POST'])
 def registration():
     if request.method == 'POST':
