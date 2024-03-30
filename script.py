@@ -82,24 +82,24 @@ def submit(user_id):
         try:
             value = int(desire)
         except ValueError:
-             return "La valeur entrée n'est pas un nombre ou n'est pas dans le bon format."
+             return "the number of desire must be between 1 and 5 or the format is incorrect"
         if value < 1 or value > 5:
-         return "La valeur entrée doit être un nombre entre 1 et 5."
+         return "the number of desire must be between 1 and 5 "
 
         if needed.lower() == "yes":
             needed = 1
         elif needed.lower() == "no":
             needed = 0
-# Initialiser la base de données si nécessaire
+# Initialize the database if this is necessary
             
-# Insérer les données dans la table IDEAS
+# Insert the data in the ideas table
         db = get_db()
 
         queryInsert = 'INSERT INTO IDEAS (Name, Description, Desire, Category, Needed, user_id) VALUES (?, ?, ?, ?, ?, ?);'
      
       
         query_db(queryInsert, [name, description, desire, category, needed,user_id] )
-        # Sélectionner et afficher les données insérées
+        # Select and get the inserted datas
       
         db.commit()
         return redirect(url_for('tableIdea', user_id=user_id))
@@ -125,6 +125,7 @@ def returnIdeas(id):
 # i sort table with the desire, i sort with the most important ideas
 def sortByDesire():
     user_id = session['user_id']
+    print(user_id)
     querySort = 'SELECT Name, Description, Desire, Category, Needed FROM IDEAS Where user_id = ? ORDER BY Desire DESC  '
     result = query_db(querySort, [user_id])
     return result
@@ -139,7 +140,7 @@ def connection(username, password):
         session['username='] = username
         
     else:
-        return "cet utilisateur n'existe pas"
+        return "this user doesn't exists"
 
 
 ## is the function which get the password and username from the login form 
@@ -151,10 +152,11 @@ def processLoginForm():
         if username and password: 
             connection(username, password)
             user_id = getIdUser(username)
-        if user_id:
-            session['user_id'] = user_id
+        if user_id:           
+            session['user_id'] = user_id         
             return render_template('formIdeas.html', user_id=user_id)
         else:
+            print(user_id)
             return "user not find"
 
     else:
@@ -162,20 +164,25 @@ def processLoginForm():
     
     
 ## its the logout  function
+@app.route('/logout')
 def logout():
     session.pop('logged_in',None)
     return redirect(url_for('login'))
 
+
+# i get the id from the username 
 def getIdUser(username):
     
     db = get_db()
-    cursor = db.execute('SELECT id FROM users WHERE username = ?', (username,))
+    print(username)
+    cursor = db.execute('SELECT id FROM USERS WHERE username = ?', (username,))
     user = cursor.fetchone()
+    print(user)
     cursor.close()
     if user:
         return user[0]
     else:
-        return None
+        return None 
 
 
 @app.route('/registration', methods=['POST'])
@@ -184,14 +191,19 @@ def registration():
          username= request.form.get('username')
          password = request.form.get('password')
          if username and password: 
-        
-            query = "INSERT INTO USERS(Username,Password) VALUES(?,?);"
-            result = query_db(query,[username,password] )
+            try:
+                db= get_db()
+                cursor = db.execute("INSERT INTO USERS(Username,Password) VALUES(?,?)" ,(username,password,))
+                db.commit()
+                if cursor:
+                    return redirect(url_for('login'))
+                else:
+                      return "Registration error"
+            except Exception as e:
+                return f"Registration erreor :  {str(e)}"
+         
          else:
-             return redirect(url_for('register'))
-         if result:
-             return redirect(url_for('login'))
-         else:
-            # Gérer les autres méthodes (par exemple, afficher un message d'erreur)
-            return "Méthode non autorisée. Veuillez utiliser la méthode POST."
+              return redirect(url_for('register'))
+    else:
+        return "Method not allowed. Please use the POST method"
 
